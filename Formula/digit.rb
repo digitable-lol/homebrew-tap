@@ -20,10 +20,31 @@ class Digit < Formula
            "--no-editable",
            "--python", formula_opt_bin("python@3.13")/"python3.13"
 
+    # Some Rust-backed Python wheels are incorrectly tagged as MH_DYLIB rather
+    # than MH_BUNDLE. Homebrew then tries to give them a Cellar dylib ID, which
+    # exceeds their Mach-O header padding. Convert those extension modules to
+    # the bundle type expected by Python and remove the now-invalid dylib ID.
+    if OS.mac?
+      require "macho"
+
+      libexec.glob("**/*.so").each do |shared_object|
+        macho = MachO.open(shared_object)
+        next unless macho.is_a?(MachO::MachOFile)
+        next unless macho.dylib_id&.start_with?("@rpath/")
+
+        macho.delete_command macho.command(:LC_ID_DYLIB).first
+        raw_data = macho.serialize
+        byte_order = (macho.endianness == :little) ? "V" : "N"
+        raw_data[12, 4] = [MachO::Headers::MH_BUNDLE].pack(byte_order)
+        shared_object.binwrite raw_data
+        MachO.codesign! shared_object if Hardware::CPU.arm?
+      end
+    end
+
     site_packages = libexec/Language::Python.site_packages("python3.13")
     (site_packages/".install_method").write "homebrew\n"
 
-    assets = share/"digit"
+    assets = pkgshare
     assets.install "skills", "optional-skills", "plugins", "locales", "optional-mcps"
 
     wrapper_env = {
@@ -45,6 +66,6 @@ class Digit < Formula
     assert_match "Digit v#{version}", version_output
     assert_match "Install method: homebrew", version_output
     assert_match "usage: digit", shell_output("#{bin}/digit --help")
-    assert_path_exists share/"digit/skills/autonomous-ai-agents/digit/SKILL.md"
+    assert_path_exists pkgshare/"skills/autonomous-ai-agents/digit/SKILL.md"
   end
 end
