@@ -1,0 +1,25 @@
+name: Test tap
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  formula:
+    runs-on: macos-14
+    timeout-minutes: 45
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit formula
+        run: brew audit --strict --formula ./Formula/digit.rb
+      - name: Install from source
+        run: brew install --build-from-source --formula ./Formula/digit.rb
+      - name: Test installation
+        run: brew test digit
