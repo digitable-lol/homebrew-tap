@@ -20,15 +20,23 @@ class Digit < Formula
            "--no-editable",
            "--python", formula_opt_bin("python@3.13")/"python3.13"
 
-    # Rust-backed Python wheels commonly ship a short @rpath dylib ID without
-    # enough Mach-O header padding for Homebrew's longer opt-prefix rewrite.
-    # @loader_path is relocatable and keeps these extension modules importable.
+    # Some Rust-backed Python wheels are incorrectly tagged as MH_DYLIB rather
+    # than MH_BUNDLE. Homebrew then tries to give them a Cellar dylib ID, which
+    # exceeds their Mach-O header padding. Convert those extension modules to
+    # the bundle type expected by Python and remove the now-invalid dylib ID.
     if OS.mac?
-      libexec.glob("**/*.so").each do |shared_object|
-        dylib_id = shared_object.dylib_id
-        next unless dylib_id&.start_with?("@rpath/")
+      require "macho"
 
-        MachO::Tools.change_dylib_id shared_object, "@loader_path/#{File.basename(dylib_id)}"
+      libexec.glob("**/*.so").each do |shared_object|
+        macho = MachO.open(shared_object)
+        next unless macho.is_a?(MachO::MachOFile)
+        next unless macho.dylib_id&.start_with?("@rpath/")
+
+        macho.delete_command macho.command(:LC_ID_DYLIB).first
+        raw_data = macho.serialize
+        byte_order = (macho.endianness == :little) ? "V" : "N"
+        raw_data[12, 4] = [MachO::Headers::MH_BUNDLE].pack(byte_order)
+        shared_object.binwrite raw_data
         MachO.codesign! shared_object if Hardware::CPU.arm?
       end
     end
