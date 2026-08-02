@@ -28,7 +28,8 @@ class Digit < Formula
         dylib_id = shared_object.dylib_id
         next unless dylib_id&.start_with?("@rpath/")
 
-        change_dylib_id shared_object, "@loader_path/#{File.basename(dylib_id)}"
+        MachO::Tools.change_dylib_id shared_object, "@loader_path/#{File.basename(dylib_id)}"
+        MachO.codesign! shared_object if Hardware::CPU.arm?
       end
     end
 
