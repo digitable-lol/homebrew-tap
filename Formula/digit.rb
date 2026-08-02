@@ -23,7 +23,7 @@ class Digit < Formula
     site_packages = libexec/Language::Python.site_packages("python3.13")
     (site_packages/".install_method").write "homebrew\n"
 
-    assets = share/"digit"
+    assets = pkgshare
     assets.install "skills", "optional-skills", "plugins", "locales", "optional-mcps"
 
     wrapper_env = {
@@ -45,6 +45,6 @@ class Digit < Formula
     assert_match "Digit v#{version}", version_output
     assert_match "Install method: homebrew", version_output
     assert_match "usage: digit", shell_output("#{bin}/digit --help")
-    assert_path_exists share/"digit/skills/autonomous-ai-agents/digit/SKILL.md"
+    assert_path_exists pkgshare/"skills/autonomous-ai-agents/digit/SKILL.md"
   end
 end

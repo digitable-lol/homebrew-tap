@@ -17,9 +17,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: "1"
     steps:
       - uses: actions/checkout@v4
+      - name: Tap checkout
+        run: brew tap digitable-lol/tap "$GITHUB_WORKSPACE"
       - name: Audit formula
-        run: brew audit --strict --formula ./Formula/digit.rb
+        run: brew audit --strict digitable-lol/tap/digit
       - name: Install from source
-        run: brew install --build-from-source --formula ./Formula/digit.rb
+        run: brew install --build-from-source digitable-lol/tap/digit
       - name: Test installation
         run: brew test digit
