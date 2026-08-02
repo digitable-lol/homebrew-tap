@@ -1,8 +1,8 @@
 class Digit < Formula
   desc "Portal-aware local AI agent by Digitable"
   homepage "https://github.com/digitable-lol/digit"
-  url "https://github.com/digitable-lol/digit/releases/download/v0.19.5/digit-0.19.5.tar.gz"
-  sha256 "3e15a7762831b6224b400a164ec5a0ab1bcbfdc3d7fe56ed5fd6fc54e9f36366"
+  url "https://github.com/digitable-lol/digit/releases/download/v0.19.6/digit-0.19.6.tar.gz"
+  sha256 "6050e06ff795358e8c9f7c8bf0c0f07b75f7bb5c295a2f416be51e34ce9b3654"
   license "MIT"
 
   depends_on "python@3.13"
