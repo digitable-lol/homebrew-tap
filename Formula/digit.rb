@@ -20,6 +20,18 @@ class Digit < Formula
            "--no-editable",
            "--python", formula_opt_bin("python@3.13")/"python3.13"
 
+    # Rust-backed Python wheels commonly ship a short @rpath dylib ID without
+    # enough Mach-O header padding for Homebrew's longer opt-prefix rewrite.
+    # @loader_path is relocatable and keeps these extension modules importable.
+    if OS.mac?
+      libexec.glob("**/*.so").each do |shared_object|
+        dylib_id = shared_object.dylib_id
+        next unless dylib_id&.start_with?("@rpath/")
+
+        change_dylib_id shared_object, "@loader_path/#{File.basename(dylib_id)}"
+      end
+    end
+
     site_packages = libexec/Language::Python.site_packages("python3.13")
     (site_packages/".install_method").write "homebrew\n"
 
