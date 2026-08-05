@@ -28,3 +28,21 @@ brew upgrade digitable-lol/tap/digit
 в `~/.digit` и не удаляются при обновлении пакета.
 
 Исходный код: [digitable-lol/digit](https://github.com/digitable-lol/digit).
+
+## flang
+
+Проверяемый язык: исполняемая спецификация, которая исполняется, тестируется и
+печатается в восемь языков. Компилятор написан на самом языке и приезжает
+напечатанным в C, поэтому **Node не нужен** — хватает `cc`.
+
+```bash
+brew install digitable-lol/tap/flang
+flang    # JSON на входе, JSON на выходе
+```
+
+Полный инструментарий — восемь бэкендов, интерпретатор, языковой сервер —
+ставится через npm и требует Node:
+
+```bash
+npm install -g @digitable-lol/fts
+```
