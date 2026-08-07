@@ -9,21 +9,27 @@
 # развивает сам язык, — ему нужен Node, чтобы получить первый бинарник из
 # исходников на flang. Тому, кто просто ставит flang, не нужен никто.
 #
+# Что получает поставивший: `flang check файл.flang` — разбор, типы и
+# доказательство завершения с человеческой диагностикой; `flang repl` —
+# интерактивная оболочка; `flang --help`, `flang --version`, `man flang`. Без
+# аргументов бинарник по-прежнему прогонщик: JSON на входе, JSON на выходе.
+#
 # Релиз готовит `node scripts/build-release-c.mjs`; он же проверяет сборку в
-# окружении без Node и запускает собранный бинарник, чтобы битый архив не уехал.
+# окружении без Node, запускает собранный бинарник и прогоняет человеческие
+# команды, чтобы битый архив не уехал.
 #
 # Установка из ещё не опубликованного релиза:
 #   brew install --build-from-source ./packaging/homebrew/flang.rb
 class Flang < Formula
   desc "Проверяемый язык: исполняемая спецификация, печатается в восемь языков"
   homepage "https://github.com/digitable-lol/flang"
-  url "https://github.com/digitable-lol/flang/releases/download/v0.4.5/flang-0.4.5-c.tar.gz"
+  url "https://github.com/digitable-lol/flang/releases/download/v0.4.6/flang-0.4.6-c.tar.gz"
   # Хеш архива, собранного `node scripts/build-release-c.mjs` и упакованного
   # `tar -czf`. Пересчитывается при каждом релизе: brew сверяет его сам, и
   # расхождение остановит установку до распаковки.
-  sha256 "146085565ec2c1d450ab2d0384c7e3b0e81e93fcd9b463dca29b530276f17a20"
+  sha256 "2fca882275b0e012eb4632335b90b02c90ff0922d9e4b9ba3185c910461fcb28"
   license "BSD-2-Clause"
-  version "0.4.5"
+  version "0.4.6"
 
   # Ни Node, ни каких-либо ещё зависимостей: в архиве C99 и Makefile.
   depends_on "make" => :build
@@ -36,11 +42,18 @@ class Flang < Formula
     bin.install "flang_cli" => "flang"
     lib.install "libkompilyator_flang.a" if File.exist?("libkompilyator_flang.a")
     include.install Dir["*.h"]
+    # Страница руководства — не украшение. Человек, поставивший язык из brew,
+    # ищет `man flang` раньше, чем README в интернете, и не найдя — решает, что
+    # инструмента нет. Лежит она в корне архива, туда её кладёт
+    # scripts/build-release-c.mjs из packaging/flang.1.
+    man1.install "flang.1"
   end
 
   test do
     # Проверяем не «запустился», а «понял язык»: подаём модуль и требуем, чтобы
-    # компилятор насчитал в нём ровно одну связанную функцию.
+    # компилятор насчитал в нём ровно одну связанную функцию. Это контракт
+    # прогонщика, и он обязан остаться прежним — им живут скрипты, зовущие
+    # программу на flang трубой.
     исходник = <<~FLANG
       модуль «Проба»
 
@@ -58,5 +71,27 @@ class Flang < Formula
     ответ = pipe_output("#{bin}/flang", "#{запрос}\n")
     assert_match '"ok":true', ответ
     assert_match '"n":"1"', ответ
+
+    # А это контракт человека, и проверять его надо отдельно: прежде бинарник
+    # ПРИНИМАЛ `--help` и `check`, молчал в ответ и отвечал нулём. Формула,
+    # смотревшая только на код возврата, такое бы пропустила — поэтому здесь
+    # требуется непустой и осмысленный вывод.
+    assert_match "flang #{version}", shell_output("#{bin}/flang --version")
+    assert_match "flang check", shell_output("#{bin}/flang --help")
+
+    (testpath/"проба.flang").write(исходник)
+    assert_match "проверено", shell_output("#{bin}/flang check проба.flang")
+
+    # Сломанный файл обязан дать ненулевой код и назвать код беды: «всегда 0»
+    # и «всегда 1» одинаково бесполезны, поэтому проверяются оба исхода.
+    (testpath/"кривая.flang").write(<<~FLANG)
+      модуль «Кривая»
+
+      тотальная функция «Два»
+        возвращает число
+        "два"
+    FLANG
+    беда = shell_output("#{bin}/flang check кривая.flang 2>&1", 1)
+    assert_match "FLANG_TYPE", беда
   end
 end
