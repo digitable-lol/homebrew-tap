@@ -89,7 +89,12 @@ class Flang < Formula
     # человеке.
     собрано = File.exist?("flang") ? "flang" : "flang_cli"
     bin.install собрано => "flang"
-    lib.install "libkompilyator_flang.a" if File.exist?("libkompilyator_flang.a")
+    # ИМЯ БИБЛИОТЕКИ СМЕНИЛОСЬ, и берётся любое. До 0.5.2 архив нёс
+    # `libkompilyator_flang.a` — транслит в имени файла, запрещённый правилом
+    # самого языка; с 0.5.2 это `libcompiler_flang.a`. Образец вместо имени —
+    # чтобы формула ставила и уже выпущенные архивы, и будущие. Заголовки шли
+    # `Dir["*.h"]` изначально и переименования не заметили.
+    lib.install Dir["lib*.a"]
     include.install Dir["*.h"]
     # Страница руководства — не украшение. Человек, поставивший язык из brew,
     # ищет `man flang` раньше, чем README в интернете, и не найдя — решает, что
