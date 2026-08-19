@@ -23,7 +23,7 @@
 class Flang < Formula
   desc "Проверяемый язык: исполняемая спецификация, печатается в восемь языков"
   homepage "https://github.com/digitable-lol/flang"
-  url "https://github.com/digitable-lol/flang/releases/download/v0.5.0/flang-0.5.0-c.tar.gz"
+  url "https://github.com/digitable-lol/flang/releases/download/v0.5.1/flang-0.5.1-c.tar.gz"
   # Хеш архива, собранного `node scripts/build-release-c.mjs` и упакованного
   # командой ниже. Пересчитывается при каждом релизе: brew сверяет его сам, и
   # расхождение остановит установку до распаковки.
@@ -67,9 +67,9 @@ class Flang < Formula
   # печатается из компилятора, компилятор меняется каждый день — значит при
   # следующем теге хеш надо пересчитать этой же командой по опубликованному
   # архиву, а не перенести отсюда.
-  sha256 "7dc75fec0526b3fe556d0108ace1f0d17ef9e51873b36a8ead36785f317d0505"
+  sha256 "ef2cbcbe2fa90c8692a10a4e5985129193a918e3ee689b80bcb970170e661de1"
   license "BSD-2-Clause"
-  version "0.5.0"
+  version "0.5.1"
 
   # Node не нужен: в архиве C99 и Makefile. Из внешнего нужен только `make` —
   # он и объявлен; всё остальное даёт компилятор C, который есть в системе
@@ -82,7 +82,13 @@ class Flang < Formula
     # единого предупреждения. Ослабить их здесь значило бы скрыть от себя же,
     # что печать испортилась.
     system "make", "CFLAGS=-std=c99 -Wall -Wextra -Werror -pedantic -O2"
-    bin.install "flang_cli" => "flang"
+    # ИМЯ ВЫХОДА У СБОРКИ СМЕНИЛОСЬ, и принимаются оба. С 0.5.1 Makefile архива
+    # кладёт рядом «flang» — именем языка; до 0.5.1 он клал «flang_cli».
+    # Формула, знающая одно имя, ломает установку на последнем шаге: всё
+    # собралось, а ставить нечего. Поймано перед выпуском 0.5.1, а не на
+    # человеке.
+    собрано = File.exist?("flang") ? "flang" : "flang_cli"
+    bin.install собрано => "flang"
     lib.install "libkompilyator_flang.a" if File.exist?("libkompilyator_flang.a")
     include.install Dir["*.h"]
     # Страница руководства — не украшение. Человек, поставивший язык из brew,
