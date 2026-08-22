@@ -44,7 +44,7 @@
 class Flang < Formula
   desc "Проверяемый язык: исполняемая спецификация, печатается в восемь языков"
   homepage "https://github.com/digitable-lol/flang"
-  url "https://github.com/digitable-lol/flang/releases/download/v0.6.1/flang-0.6.1-c.tar.gz"
+  url "https://github.com/digitable-lol/flang/releases/download/v0.6.2/flang-0.6.2-c.tar.gz"
   # Хеш архива, собранного `node scripts/build-release-c.mjs` и упакованного
   # командой ниже. Пересчитывается при каждом релизе: brew сверяет его сам, и
   # расхождение остановит установку до распаковки.
@@ -79,15 +79,22 @@ class Flang < Formula
   #
   #   node scripts/build-release-c.mjs
   #   tar --sort=name --format=ustar --owner=0 --group=0 --numeric-owner \
-  #       --mtime=@0 --mode=u=rw,go=r -C output/release-c -cf - \
+  #       --mtime=@0 --mode=u=rw,go=r,a+X -C output/release-c -cf - \
   #       LICENSE Makefile compiler_flang.c compiler_flang.h flang.1 \
   #       flang_cli.c flang_repl.c flang_runtime.c flang_runtime.h runtime-c \
-  #     | gzip -9n > output/flang-0.6.1-c.tar.gz
+  #     | gzip -9n > output/flang-0.6.2-c.tar.gz
   #
   # LICENSE стоит в списке первым и не забывается: пункт 1 BSD-2-Clause требует
   # сохранять уведомление при распространении исходников, а архив — это ровно
   # распространение исходников. Прежде этой строки в списке не было, хотя
   # scripts/build-release-c.mjs файл кладёт: список и скрипт разошлись молча.
+  #
+  # БУКВА `X` В РЕЖИМЕ ОБЯЗАТЕЛЬНА, и стоила она сломанной установки. `u=rw,go=r`
+  # снимает право входа и с КАТАЛОГОВ: `runtime-c` приезжал как `drw-r--r--`,
+  # имена внутри видны, а открыть файл нельзя. `brew install` падал на
+  # `Errno::ENOENT: runtime-c/flang_cli.c` — и падал у всех, начиная с той версии,
+  # где каталог появился. `a+X` даёт право входа каталогам и не трогает файлы,
+  # ровно как у chmod. Разбор — в `docs/zettel/a-tar-mode-for-files-locks-directories.md`.
   #
   # Нужен GNU tar: у bsdtar (macOS) нет `--sort` и `--mtime`, и байты выйдут
   # другими. На macOS это `gtar` из пакета `gnu-tar`.
@@ -97,14 +104,14 @@ class Flang < Formula
   # верен ровно для того дерева, на котором его считали, и при теге его надо
   # пересчитать ещё раз этой же командой.
   #
-  # Число ниже посчитано 22 августа 2026 на архиве выпуска 0.6.1: 2 975 344 байта,
+  # Число ниже посчитано 22 августа 2026 на архиве выпуска 0.6.2: 2 995 862 байта,
   # собран приведённой выше командой из `output/release-c` и приложен к релизу
-  # v0.6.1 тем же файлом. Внутри десять имён, ни одного `.o` и ни одного
+  # v0.6.2 тем же файлом. Внутри десять имён, ни одного `.o` и ни одного
   # собранного двоичного — проверено распаковкой. Прежде здесь стояло
-  # f1df121b… от выпуска 0.6.0.
-  sha256 "a1e2e5a99ffc76a526a217d48ccfc93c76c0f3cda07c66986d6a9c5a8b8a18d1"
+  # a1e2e5a9… от выпуска 0.6.1, чей архив был собран без буквы X и не ставился.
+  sha256 "b8d82b1cfee57354374c5343f012f7119e884c3acb383150034136cbb5f5b259"
   license "BSD-2-Clause"
-  version "0.6.1"
+  version "0.6.2"
 
   # Node не нужен: в архиве C99 и Makefile. Из внешнего нужен только `make` —
   # он и объявлен; всё остальное даёт компилятор C, который есть в системе
