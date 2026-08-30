@@ -1,26 +1,29 @@
 # Формула Homebrew для уробороса.
 #
-# ЭТО КОПИЯ. Исходник живёт в самом хранилище инструмента:
-# digitable-lol/ouroboros, файл packaging/homebrew/ouroboros.rb. Правки вносятся
-# там, сюда выкладываются копией при выпуске. Отсюда работает короткая строка:
+# ЧТО ЭТО. Исходник формулы. Правится здесь; в хранилище формул
+# (digitable-lol/homebrew-tap, файл Formula/ouroboros.rb) он выкладывается
+# копией, и оттуда работает короткая строка
 #
 #     brew install digitable-lol/tap/ouroboros
 #
-# ЧТО ПРОСТАВЛЕНО. url и sha256 — настоящие, от выпуска v0.3.1. Отпечаток
-# посчитан с того самого архива, который отдаёт GitHub:
+# Хранилище формул заведено, копия там лежит, короткая строка проверена
+# прогоном: brew подключает хранилище сам, отдельная команда brew tap не нужна.
 #
-#     curl -sL https://github.com/digitable-lol/ouroboros/archive/refs/tags/v0.3.1.tar.gz | sha256sum
+# ЧТО ПРОСТАВЛЕНО. url и sha256 — настоящие, от выпуска v0.4.0. Отпечаток
+# посчитан с того самого архива, который отдаёт GitHub, и сверен двумя загрузками:
 #
-# Установка проверена целиком: brew tap, brew install по короткой строке и
-# brew test.
+#     curl -sL https://github.com/digitable-lol/ouroboros/archive/refs/tags/v0.4.0.tar.gz | sha256sum
+#
+# Установка проверена целиком: короткая строка выше на машине без Homebrew и без
+# хранилищ формул, затем brew test, затем обмазка файла, запуск и чтение записей.
 #
 class Ouroboros < Formula
   include Language::Python::Virtualenv
 
   desc "Records how code actually ran: calls, arguments, results, exceptions"
   homepage "https://github.com/digitable-lol/ouroboros"
-  url "https://github.com/digitable-lol/ouroboros/archive/refs/tags/v0.3.1.tar.gz"
-  sha256 "01043578822eb5a293969e243d91fae8c471635f64aa773a310efa99aa7b0e95"
+  url "https://github.com/digitable-lol/ouroboros/archive/refs/tags/v0.4.0.tar.gz"
+  sha256 "4a55316c8cfe3b42756054c6853643c5c110aed8066677db43ad3638db04d738"
   license "BSD-2-Clause"
 
   # Пакет требует Python 3.12 или новее (pyproject.toml, requires-python).
@@ -30,9 +33,11 @@ class Ouroboros < Formula
   #
   #   libclang       — приходит зависимостью самого пакета, отдельно не нужен;
   #   @babel/parser  — лежит внутри пакета, npm install не нужен;
+  #   go/parser      — входит в поставку языка Go, отдельно не нужен;
   #   llvm, node,    — нужны, только чтобы СОБРАТЬ и ЗАПУСТИТЬ обмазанный код на
   #   elixir           C/C++, JavaScript и Elixir. Тянуть их каждому, кто ставит
   #                    инструмент ради Python, неправильно. См. caveats ниже.
+  #   go             — нужен и чтобы ОБМАЗАТЬ Go: разбор идёт его же средствами.
   def install
     # Пакет ставится в собственное окружение, наружу выносятся только его
     # команды — ouroboros и ouroboros-mcp.
@@ -66,6 +71,7 @@ class Ouroboros < Formula
         brew install llvm      # clang-tidy и clangd — для команд lint/symbols/refs/callers/describe
         brew install node      # запустить обмазанный JavaScript и TypeScript
         brew install elixir    # запустить обмазанный Elixir
+        brew install go        # обмазать, собрать и запустить Go
       Компилятор C и C++ берётся системный.
 
       Страницы: https://digitable-lol.github.io/ouroboros/
@@ -73,8 +79,10 @@ class Ouroboros < Formula
   end
 
   test do
-    # 1. Обе команды встали на место и запускаются.
-    assert_match "python", shell_output("#{bin}/ouroboros languages")
+    # 1. Обе команды встали на место и запускаются, и знают все шесть языков.
+    languages = shell_output("#{bin}/ouroboros languages")
+    assert_match "python", languages
+    assert_match "go", languages
 
     # 2. Инструмент делает своё дело: обмазывает файл, файл запускается,
     #    записи читаются. Это проверка end-to-end, а не «файл существует».
