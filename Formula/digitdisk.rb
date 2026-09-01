@@ -26,19 +26,23 @@
 class Digitdisk < Formula
   desc "Read-only disk and system reporter: where the space went, how the machine feels"
   homepage "https://github.com/digitable-lol/digitdisk"
-  version "0.1.0"
+  version "0.1.1"
   license "BSD-2-Clause"
+
+  # Адрес объявлен БЕЗУСЛОВНО, а не только внутри on_linux, и это не
+  # небрежность. Формула обязана прочитаться на любой машине: без адреса
+  # снаружи Homebrew падает ещё до проверки depends_on, и человек на маке
+  # получает «formula requires at least a URL» со следом вызовов вместо
+  # внятного «нужен Linux». Отказ должен объяснять, а не пугать.
+  url "https://github.com/digitable-lol/digitdisk/releases/download/v0.1.1/digitdisk-0.1.1-linux-amd64.tar.gz"
+  sha256 "589c124cd70ce2d138d23331e64016fae70d07bc0b415ee1b621554db80e92e0"
 
   depends_on :linux
 
   on_linux do
-    on_intel do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.1.0/digitdisk-0.1.0-linux-amd64.tar.gz"
-      sha256 "a4730fb595ff30a52ae2b0c24f522afd7e87fadbf34aa45c080115ff8271b1fd"
-    end
     on_arm do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.1.0/digitdisk-0.1.0-linux-arm64.tar.gz"
-      sha256 "320e7cb20eb9bf08fa9ed3ebf685c68fb9577236eb26e42a597f3218e5b4fe4e"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.1.1/digitdisk-0.1.1-linux-arm64.tar.gz"
+      sha256 "0e0a926cadabd8a351766f855dc2c6fbca3fe93e8c1caf696bff8269a123faa8"
     end
   end
 
