@@ -40,30 +40,30 @@
 class Digitdisk < Formula
   desc "Read-only disk and system reporter: where the space went, how the machine feels"
   homepage "https://github.com/digitable-lol/digitdisk"
-  version "0.3.0"
+  version "0.4.0"
   license "BSD-2-Clause"
 
   # Адрес объявлен безусловно, а не только внутри on_linux: без него Homebrew
   # падает ещё до проверок системы, и человек видит след вызовов вместо
   # объяснения. Проверено на живой машине владельца.
-  url "https://github.com/digitable-lol/digitdisk/releases/download/v0.3.0/digitdisk-0.3.0-linux-amd64.tar.gz"
-  sha256 "ce7b1d8d6cc1d2d1d781bb63d3a315167aafd38931d6c1c7517f1e7c25eab590"
+  url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-linux-amd64.tar.gz"
+  sha256 "f741bdbbc790080ae22b9c8a53092cd61b5407e2c0541d8e62c9e1f9ec98f4cb"
 
   on_linux do
     on_arm do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.3.0/digitdisk-0.3.0-linux-arm64.tar.gz"
-      sha256 "46e0133b1e87ddc5c874d28b9e0a3e084443f04a7a62cfe6b4d156fc629f59b9"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-linux-arm64.tar.gz"
+      sha256 "a1f1dfd2a92231957ef07d22141ea89252ac18aa9c2503a6452eb774e93a88f4"
     end
   end
 
   on_macos do
     on_intel do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.3.0/digitdisk-0.3.0-darwin-amd64.tar.gz"
-      sha256 "a0a4eea5554af079554a9f2990c9b0a2ca905055d957e097eabd828a548cd415"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-darwin-amd64.tar.gz"
+      sha256 "973d81e466375d747230adabc8845b20d0093cb44a99b0398edf99e8eb82f65d"
     end
     on_arm do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.3.0/digitdisk-0.3.0-darwin-arm64.tar.gz"
-      sha256 "d401693b60ce2068074b289259c2d7cdf14f61f717735021b6f2ffdc5c5290dd"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-darwin-arm64.tar.gz"
+      sha256 "a2e7cf33f8b96307cd0dafdcdcd1e25af8ba565712b123edffb46447da1f5906"
     end
   end
 
