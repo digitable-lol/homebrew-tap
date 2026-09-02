@@ -40,35 +40,39 @@
 class Digitdisk < Formula
   desc "Read-only disk and system reporter: where the space went, how the machine feels"
   homepage "https://github.com/digitable-lol/digitdisk"
-  version "0.4.0"
+  version "0.5.0"
   license "BSD-2-Clause"
 
   # Адрес объявлен безусловно, а не только внутри on_linux: без него Homebrew
   # падает ещё до проверок системы, и человек видит след вызовов вместо
   # объяснения. Проверено на живой машине владельца.
-  url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-linux-amd64.tar.gz"
-  sha256 "f741bdbbc790080ae22b9c8a53092cd61b5407e2c0541d8e62c9e1f9ec98f4cb"
+  url "https://github.com/digitable-lol/digitdisk/releases/download/v0.5.0/digitdisk-0.5.0-linux-amd64.tar.gz"
+  sha256 "be2aa649978e103066d79f080b59e761e15a72d33faa8e25c8ff2af712881539"
 
   on_linux do
     on_arm do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-linux-arm64.tar.gz"
-      sha256 "a1f1dfd2a92231957ef07d22141ea89252ac18aa9c2503a6452eb774e93a88f4"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.5.0/digitdisk-0.5.0-linux-arm64.tar.gz"
+      sha256 "4f610ed9657ee9fe483513c301133e62f88613402d54c509fa81026be3738b54"
     end
   end
 
   on_macos do
     on_intel do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-darwin-amd64.tar.gz"
-      sha256 "973d81e466375d747230adabc8845b20d0093cb44a99b0398edf99e8eb82f65d"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.5.0/digitdisk-0.5.0-darwin-amd64.tar.gz"
+      sha256 "e30aa56457325485ad0ff9f4a6d1df5e4cfd4e97768a7305a7ed3dc6e5e39cf7"
     end
     on_arm do
-      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.4.0/digitdisk-0.4.0-darwin-arm64.tar.gz"
-      sha256 "a2e7cf33f8b96307cd0dafdcdcd1e25af8ba565712b123edffb46447da1f5906"
+      url "https://github.com/digitable-lol/digitdisk/releases/download/v0.5.0/digitdisk-0.5.0-darwin-arm64.tar.gz"
+      sha256 "272f270b748f047f0b83f6729c56d7e68cabd988ba8f0bc4f558df6954eebdec"
     end
   end
 
   def install
     bin.install "digitdisk"
+    # man1 — то место, где `man digitdisk` страницу и ищет: Homebrew кладёт
+    # свой share/man в MANPATH сам. Отдельной настройки от поставившего это
+    # не требует, и проверяется ниже, в test do.
+    man1.install "digitdisk.1"
     doc.install "README.md", "README.ru.md", "NOTICE", "LICENSE"
   end
 
@@ -76,8 +80,9 @@ class Digitdisk < Formula
     <<~EOS
       Проверить установку:
         digitdisk --version
-        digitdisk status
+        digitdisk            # снимок системы: то же, что digitdisk status
         digitdisk analyze ~
+        man digitdisk        # ключи, файлы, примеры
 
       status и analyze только читают. Уборка — отдельная команда и три шага:
         digitdisk clean <путь>                 план, ничего не тронуто
@@ -122,5 +127,13 @@ class Digitdisk < Formula
     #    проверяется, а не подразумевается.
     справка = shell_output("#{bin}/digitdisk --help")
     refute_match(/--(delete|remove|clean|force)/, справка)
+
+    # 6. Страница руководства поставлена туда, где её ищет man, и это
+    #    проверяется файлом, а не верой в install. Формула ставит двоичный
+    #    файл; страница едет с ним в том же архиве и без этой строки молча
+    #    осталась бы в нём.
+    страница = man1/"digitdisk.1"
+    assert_path_exists страница
+    assert_match "DIGITDISK 1", страница.read
   end
 end
