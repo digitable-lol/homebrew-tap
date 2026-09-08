@@ -50,21 +50,33 @@ npm install -g @digitable-lol/fts
 ## Уроборос
 
 Показывает, как код исполнялся на самом деле: какие функции звались, с какими
-доводами, что вернули и что бросили. Языки: Python, JavaScript/TypeScript, C,
-C++, Elixir.
+доводами, что вернули и что бросили. Языков восемь: Python, JavaScript/TypeScript,
+C, C++, Elixir, Go, Java, C#.
 
 ```bash
 brew install digitable-lol/tap/ouroboros
-ouroboros languages
+ouroboros languages     # список языков — им же проверяется, что инструмент встал
 ```
 
 Формула ставит пакет в собственное окружение Python и выносит наружу две
 команды — `ouroboros` (командная строка) и `ouroboros-mcp` (сервер MCP для
 ИИ-агентов). Нужен Python 3.12 или новее; Homebrew доставит его сам.
 
-Чтобы обмазывать не Python, доставьте отдельно: `llvm` (команды `lint`,
-`symbols`, `refs`, `callers`, `describe`), `node` (JavaScript и TypeScript),
-`elixir`. Компилятор C и C++ берётся системный.
+Чтобы обмазывать не Python, доставьте отдельно:
+
+```bash
+brew install llvm      # clang-tidy и clangd — команды lint, symbols, refs, callers, describe
+brew install node      # запустить обмазанный JavaScript и TypeScript
+brew install elixir    # запустить обмазанный Elixir
+brew install go        # обмазать, собрать и запустить Go
+brew install openjdk   # обмазать и собрать Java
+brew install dotnet    # обмазать и собрать C#
+```
+
+Компилятор C и C++ берётся системный. Тот же список печатает `caveats` формулы, и
+там же сказано, почему эти шесть не записаны в зависимости: они нужны только тем,
+кто обмазывает соответствующий язык, а тянуть их каждому, кто ставит инструмент
+ради Python, неправильно.
 
 Обновление и удаление:
 

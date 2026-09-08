@@ -1,27 +1,87 @@
+# Проверки хранилища формул.
+#
+# Здесь две разные беды, и ловятся они по-разному.
+#
+# 1. ФОРМУЛА СЛОМАНА — не ставится, не проходит brew test. Ловится установкой на
+#    настоящем macOS: задача `formula`.
+#
+# 2. ФОРМУЛА ОТСТАЛА — она исправна, ставится, brew на неё не ругается, а ставит
+#    прошлогоднее. Установкой это НЕ ловится вовсе: с точки зрения brew всё в
+#    порядке. Ровно так вышло с flang — кран стоял на 0.7.3, пока выходили
+#    0.7.4—0.7.9, и шесть выпусков подряд человек получал не то, что вышло.
+#    Ловится сверкой с выпусками исходников: задача `versions`.
+#
+# Раньше здесь проверялся ОДИН digit из пяти формул, а называлось это «Test tap».
+# Четыре формулы из пяти не проверялись ничем — и были при этом зелёными.
+
 name: Test tap
 
 on:
   pull_request:
   push:
     branches: [main]
+  # Отстать кран может и без единой правки здесь: выпуск делают в другом
+  # хранилище, а этому никто не сообщает. Поэтому — ежедневно.
+  schedule:
+    - cron: "23 7 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  # Отставание. Быстро и без macOS: спрашивается GitHub, какой выпуск последний.
+  versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Сперва — проверка самой проверки. Правило, которое ничего не ловит,
+      # выглядит ровно как правило, которое всё прошло: первая версия этой
+      # проверки читала версию как «0.5.0.tar» и была при этом целиком зелёной.
+      - name: правила работают
+        run: python3 scripts/versions-not-stale.py --self-test
+
+      - name: формулы раздают последний выпуск
+        env:
+          # Без ключа GitHub считает запросы по адресу бегунка и быстро отвечает
+          # 403; проверка тогда вернёт 2 («не спросили»), а не соврёт зелёным.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/versions-not-stale.py
+
+  # Поломка. Установка на настоящем macOS, по формуле на бегунок.
   formula:
     runs-on: macos-14
     timeout-minutes: 45
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
+    strategy:
+      # Упавшая формула не должна отменять проверку остальных: узнать надо про
+      # все сразу, а не про первую попавшуюся.
+      fail-fast: false
+      matrix:
+        # ВНИМАНИЕ: flang, digitdisk и digitwm сюда пока НЕ добавлены — не потому,
+        # что они не нужны, а потому, что их установку здесь ни разу не прогоняли.
+        # Включить их вслепую значило бы выдать чужую непроверенность за поломку
+        # этой правки. Каждая добавляется одной строкой; сделать это стоит
+        # отдельным заходом, глядя на первый прогон.
+        formula: [digit, ouroboros]
     steps:
       - uses: actions/checkout@v4
+
       - name: Tap checkout
         run: brew tap digitable-lol/tap "$GITHUB_WORKSPACE"
+
       - name: Audit formula
-        run: brew audit --strict digitable-lol/tap/digit
+        run: brew audit --strict digitable-lol/tap/${{ matrix.formula }}
+
       - name: Install from source
-        run: brew install --build-from-source digitable-lol/tap/digit
+        run: brew install --build-from-source digitable-lol/tap/${{ matrix.formula }}
+
       - name: Test installation
-        run: brew test digit
+        run: brew test ${{ matrix.formula }}
