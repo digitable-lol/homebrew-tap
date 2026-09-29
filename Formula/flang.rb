@@ -1,10 +1,10 @@
 class Flang < Formula
   desc "Проверяемый язык: исполняемая спецификация, печатается в восемь языков"
   homepage "https://github.com/digitable-lol/flang"
-  url "https://github.com/digitable-lol/flang/releases/download/v0.7.22/flang-0.7.22-c.tar.gz"
-  sha256 "5631f088aa49a98b48bd868908ef2cda0a096073b4f1eb0568592f7f3d41b5d1"
+  url "https://github.com/digitable-lol/flang/releases/download/v0.7.23/flang-0.7.23-c.tar.gz"
+  sha256 "16c675e3ef1582034ad66f80ea1a5efa829e04b65f4cf11e05ccfd5c7a421304"
   license "BSD-2-Clause"
-  version "0.7.22"
+  version "0.7.23"
 
   depends_on "make" => :build
 
