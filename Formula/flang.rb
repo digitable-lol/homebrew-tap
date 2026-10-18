@@ -1,10 +1,10 @@
 class Flang < Formula
   desc "Проверяемый язык: исполняемая спецификация, печатается в восемь языков"
   homepage "https://github.com/digitable-lol/flang"
-  url "https://github.com/digitable-lol/flang/releases/download/v0.7.28/flang-0.7.28-c.tar.gz"
-  sha256 "6a60dda815412cded0056ede19403b64627c8438c854e285350b77c5a5cbd72e"
+  url "https://github.com/digitable-lol/flang/releases/download/v0.7.29/flang-0.7.29-c.tar.gz"
+  sha256 "ccdb4f737acb0195270d6094c94dc410b50e0d02452283cac00a0d286ac3b970"
   license "BSD-2-Clause"
-  version "0.7.28"
+  version "0.7.29"
 
   depends_on "make" => :build
 
@@ -108,6 +108,20 @@ class Flang < Formula
     цели.each do |цель|
       assert_predicate share/"flang/#{цель}", :directory?
     end
-    assert_equal цели.length, Dir[share/"flang/*"].count { |путь| File.directory?(путь) }
+    assert_equal цели.length, Dir[share/"flang/*"].count { |путь| File.directory?(путь) && File.basename(путь) != "stdlib" }
+
+    return unless (share/"flang/stdlib").directory?
+
+    (testpath/"библиотека.flang").write(<<~FLANG)
+      модуль «С библиотекой»
+        использует «Lists» только «Соединить списки»
+
+      тотальная функция «Два»
+        возвращает список строки
+        «Соединить списки» от ["а"] и ["б"]
+    FLANG
+    assert_match "проверено", shell_output("#{bin}/flang check библиотека.flang")
+    shell_output("#{bin}/flang emit библиотека.flang --target c --out печать-библиотеки 2>&1")
+    assert_predicate testpath/"печать-библиотеки/flang_runtime.c", :exist?
   end
 end
