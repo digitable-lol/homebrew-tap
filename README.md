@@ -31,21 +31,19 @@ brew upgrade digitable-lol/tap/digit
 
 ## flang
 
-Проверяемый язык: исполняемая спецификация, которая исполняется, тестируется и
-печатается в восемь языков. Компилятор написан на самом языке и приезжает
-напечатанным в C, поэтому **Node не нужен** — хватает `cc`.
+Проверяемый язык программирования: типы, доказанное завершение и доказательства
+постусловий до запуска; программы печатаются в C и другие языки. Формула
+`flang-package` ставит готовую сборку для macOS и Linux вместе со стандартной
+библиотекой; компилятор C не нужен.
 
 ```bash
-brew install digitable-lol/tap/flang
-flang    # JSON на входе, JSON на выходе
+brew install digitable-lol/tap/flang-package
+flang --version
 ```
 
-Полный инструментарий — восемь бэкендов, интерпретатор, языковой сервер —
-ставится через npm и требует Node:
-
-```bash
-npm install -g @digitable-lol/fts
-```
+Прежнее имя `brew install digitable-lol/tap/flang` работает: это ссылка
+`Aliases/flang` на ту же формулу. Исходники и документация —
+[digitable-lol/flang](https://github.com/digitable-lol/flang).
 
 ## Уроборос
 
