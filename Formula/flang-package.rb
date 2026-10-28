@@ -1,28 +1,28 @@
 class FlangPackage < Formula
   desc "Verifiable programming language that prints programs into ten languages"
   homepage "https://github.com/digitable-lol/flang"
-  version "0.7.30"
+  version "0.7.31"
   license "BSD-2-Clause"
 
   on_macos do
     on_arm do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.30/flang-package-0.7.30-macos-arm64.tar.gz"
-      sha256 "45e97979d507475ac27e398e9ad7b28a9715477b701116e52d3ffbeaaec5f32b"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-macos-arm64.tar.gz"
+      sha256 "1b6e850495f90f8c26093180a125d9b4780fb054a76ef9cb95daed62b1963eb0"
     end
     on_intel do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.30/flang-package-0.7.30-macos-x86_64.tar.gz"
-      sha256 "2b6b85fa3bb17fcae4da31b052de749cc3de4b01443d54eab957fff56ae64d3d"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-macos-x86_64.tar.gz"
+      sha256 "f3f78751b4ea5dc5c74db2bf1dc4912fb444b27390720bc17579f026b81e55cb"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.30/flang-package-0.7.30-linux-aarch64.tar.gz"
-      sha256 "294b33a57b059dc14dafe67a07ac2983655cc4e3e8764a6e29bc514189d4a1aa"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-linux-aarch64.tar.gz"
+      sha256 "55a45ff2e601725b06f0e2bcda6d3ba16773a211b952da83cec43939a815fe4c"
     end
     on_intel do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.30/flang-package-0.7.30-linux-x86_64.tar.gz"
-      sha256 "fa3e8bd1eaa52b44c8f843544c21295acc13e80faa9c1dc281d0e2473009fd49"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-linux-x86_64.tar.gz"
+      sha256 "c92536aafeb200a4a2811b87bb53fb7b3cf4d568a180b1d3d8d3c12bd993994e"
     end
   end
 
