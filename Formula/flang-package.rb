@@ -1,28 +1,28 @@
 class FlangPackage < Formula
   desc "Verifiable programming language that prints programs into ten languages"
   homepage "https://github.com/digitable-lol/flang"
-  version "0.7.31"
+  version "0.7.32"
   license "BSD-2-Clause"
 
   on_macos do
     on_arm do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-macos-arm64.tar.gz"
-      sha256 "1b6e850495f90f8c26093180a125d9b4780fb054a76ef9cb95daed62b1963eb0"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.32/flang-package-0.7.32-macos-arm64.tar.gz"
+      sha256 "b1eea398db8e75b42f223bf8305aa6886bf1c62eafc6c48077cb43d083d0a066"
     end
     on_intel do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-macos-x86_64.tar.gz"
-      sha256 "f3f78751b4ea5dc5c74db2bf1dc4912fb444b27390720bc17579f026b81e55cb"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.32/flang-package-0.7.32-macos-x86_64.tar.gz"
+      sha256 "affe86468ffdd04e5734a6204359147fb6605c6a0238e8571d67965208d26aee"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-linux-aarch64.tar.gz"
-      sha256 "55a45ff2e601725b06f0e2bcda6d3ba16773a211b952da83cec43939a815fe4c"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.32/flang-package-0.7.32-linux-aarch64.tar.gz"
+      sha256 "d294b78de61710785fcc1bd146f8dbd9a4900b3775845ead85e974581c8af6fe"
     end
     on_intel do
-      url "https://github.com/digitable-lol/flang/releases/download/v0.7.31/flang-package-0.7.31-linux-x86_64.tar.gz"
-      sha256 "c92536aafeb200a4a2811b87bb53fb7b3cf4d568a180b1d3d8d3c12bd993994e"
+      url "https://github.com/digitable-lol/flang/releases/download/v0.7.32/flang-package-0.7.32-linux-x86_64.tar.gz"
+      sha256 "e2f2c93bc692015e717e58ac64ac549265f16a525ab6e9645e6694f04537c2e9"
     end
   end
 
@@ -37,6 +37,8 @@ class FlangPackage < Formula
     include.install Dir["include/*"] if Dir.exist?("include")
     (share/"flang").install Dir["share/flang/*"]
     (share/"flang-tutor").install Dir["share/flang-tutor/*"] if Dir.exist?("share/flang-tutor")
+    # The spec template `flang new` copies into a new package (0.7.31 and newer).
+    (share/"flang-fspec").install Dir["share/flang-fspec/*"] if Dir.exist?("share/flang-fspec")
     man1.install "share/man/man1/flang.1"
   end
 
